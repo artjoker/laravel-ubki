@@ -1,0 +1,42 @@
+{
+    "name": "vt2/laravel-ubki",
+    "description": "Package for integration UBKI",
+    "authors": [
+        {
+            "name": "Volodymyr Taranenko",
+            "email": "taranenko@vt2.com.ua"
+        }
+    ],
+    "homepage": "https://github.com/VT2/laravel-ubki",
+    "keywords": ["Laravel", "Ubki"],
+    "license": "MIT",
+    "require": {
+        "illuminate/support": "~5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~7.0",
+        "mockery/mockery": "^1.1",
+        "orchestra/testbench": "~3.0",
+        "sempro/phpunit-pretty-print": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vt2\\LaravelUbki\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Vt2\\LaravelUbki\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Vt2\\LaravelUbki\\LaravelUbkiServiceProvider"
+            ],
+            "aliases": {
+                "LaravelUbki": "Vt2\\LaravelUbki\\Facades\\LaravelUbki"
+            }
+        }
+    }
+}
