@@ -99,7 +99,7 @@
 
             $result = $this->_queryXml();
 
-            if($result['status'] == 'error' && $result['errors']['errtype'] == $this::ERROR_BAD_TOKEN){
+            if ($result['status'] == 'error' && $result['errors']['errtype'] == $this::ERROR_BAD_TOKEN) {
                 UbkiToken::where('token', $this->_session_key)->first()->delete();
                 $this->_session_key = '';
             }
@@ -253,8 +253,8 @@
                 case 'contacts':
                     return $this->_prepare(config('ubki.reports.contacts'));
                     break;
-                case 'scoring_ball':
-                    return $this->_prepare(config('ubki.reports.scoring_ball'));
+                case 'scoring':
+                    return $this->_prepare(config('ubki.reports.scoring'));
                     break;
                 case 'identification':
                     return $this->_prepare(config('ubki.reports.identification'));
@@ -288,25 +288,37 @@
                         mname="' . $this->_attributes[config('ubki.model_data.mname')] . '"
                         bdate="' . $this->_attributes[config('ubki.model_data.bdate')] . '"
                         orgname=""
-                     ></ident>'
-                . '<docs><doc 
+                     ></ident>';
+
+            if ($cod_report != config('ubki.reports.passport')) {
+                $req_request .= '<spd inn="' . $this->_attributes[config('ubki.model_data.okpo')] . '" />';
+
+                $req_request .= '<docs><doc 
                         dtype="' . $this->_attributes[config('ubki.model_data.dtype')] . '"
                         dser="' . $this->_attributes[config('ubki.model_data.dser')] . '"
                         dnom="' . $this->_attributes[config('ubki.model_data.dnom')] . '"
-                    /></docs>'
-                . '<contacts><cont
+                    /></docs>';
+
+                $req_request .= '<contacts><cont
                         ctype = "' . $this->_attributes[config('ubki.model_data.ctype')] . '"
                         cval  = "' . $this->_attributes[config('ubki.model_data.cval')] . '"
-                    /></contacts >'
-                . '<mvd
+                    /></contacts >';
+            }
+
+            if ($cod_report == config('ubki.reports.standard') ||
+                $cod_report == config('ubki.reports.standard_pb') ||
+                $cod_report == config('ubki.reports.passport')) {
+                $req_request .= '<mvd
                         pser   = "' . $this->_attributes[config('ubki.model_data.dser')] . '"
                         pnom   = "' . $this->_attributes[config('ubki.model_data.dnom')] . '"
                         plname = "' . $this->_attributes[config('ubki.model_data.lname')] . '"
                         pfname = "' . $this->_attributes[config('ubki.model_data.fname')] . '"
                         pmname = "' . $this->_attributes[config('ubki.model_data.mname')] . '"
                         pbdate = "' . $this->_attributes[config('ubki.model_data.bdate')] . '"
-                ></mvd >'
-                . '</i></request>';
+                ></mvd >';
+            }
+
+            $req_request .= '</i></request>';
 
             return $req_xml = '<?xml version="1.0" encoding="utf-8"?>'
                 . '<doc>'
