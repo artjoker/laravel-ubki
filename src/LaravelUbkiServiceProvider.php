@@ -1,6 +1,6 @@
 <?php
 
-    namespace Vt2\LaravelUbki;
+    namespace Artjoker\LaravelUbki;
 
     use Illuminate\Support\ServiceProvider;
 

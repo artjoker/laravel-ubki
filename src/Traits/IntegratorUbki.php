@@ -1,8 +1,8 @@
 <?php
 
-    namespace Vt2\LaravelUbki\Traits;
+    namespace Artjoker\LaravelUbki\Traits;
 
-    use Vt2\LaravelUbki\Facades\LaravelUbki;
+    use Artjoker\LaravelUbki\Facades\LaravelUbki;
 
     trait IntegratorUbki
     {

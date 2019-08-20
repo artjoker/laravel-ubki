@@ -1,12 +1,12 @@
 <?php
 
-    namespace Vt2\LaravelUbki;
+    namespace Artjoker\LaravelUbki;
 
     use Carbon\Carbon;
     use GuzzleHttp\Client;
     use GuzzleHttp\Psr7\Request;
     use SimpleXMLElement;
-    use Vt2\LaravelUbki\Models\UbkiToken;
+    use Artjoker\LaravelUbki\Models\UbkiToken;
 
     class LaravelUbki
     {

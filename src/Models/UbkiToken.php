@@ -1,6 +1,6 @@
 <?php
 
-    namespace Vt2\LaravelUbki\Models;
+    namespace Artjoker\LaravelUbki\Models;
 
     use Illuminate\Database\Eloquent\Model;
 

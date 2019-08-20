@@ -1,6 +1,6 @@
 <?php
 
-    namespace Vt2\LaravelUbki\Facades;
+    namespace Artjoker\LaravelUbki\Facades;
 
     use Illuminate\Support\Facades\Facade;
 
