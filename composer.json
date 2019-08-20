@@ -1,5 +1,5 @@
 {
-    "name": "vt2/laravel-ubki",
+    "name": "artjoker/laravel-ubki",
     "description": "Package for integration UBKI",
     "authors": [
         {
@@ -7,7 +7,7 @@
             "email": "taranenko@vt2.com.ua"
         }
     ],
-    "homepage": "https://github.com/VT2/laravel-ubki",
+    "homepage": "https://github.com/artjoker/laravel-ubki",
     "keywords": ["Laravel", "Ubki"],
     "license": "MIT",
     "require": {
@@ -21,21 +21,21 @@
     },
     "autoload": {
         "psr-4": {
-            "Vt2\\LaravelUbki\\": "src/"
+            "Artjoker\\LaravelUbki\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Vt2\\LaravelUbki\\Tests\\": "tests"
+            "Artjoker\\LaravelUbki\\Tests\\": "tests"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Vt2\\LaravelUbki\\LaravelUbkiServiceProvider"
+                "Artjoker\\LaravelUbki\\LaravelUbkiServiceProvider"
             ],
             "aliases": {
-                "LaravelUbki": "Vt2\\LaravelUbki\\Facades\\LaravelUbki"
+                "LaravelUbki": "Artjoker\\LaravelUbki\\Facades\\LaravelUbki"
             }
         }
     }

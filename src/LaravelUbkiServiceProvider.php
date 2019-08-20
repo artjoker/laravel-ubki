@@ -13,8 +13,8 @@
          */
         public function boot()
         {
-            // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'vt2');
-            // $this->loadViewsFrom(__DIR__.'/../resources/views', 'vt2');
+            // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'artjoker');
+            // $this->loadViewsFrom(__DIR__.'/../resources/views', 'artjoker');
             // $this->loadRoutesFrom(__DIR__.'/routes.php');
 
             $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
@@ -68,17 +68,17 @@
 
             // Publishing the views.
             /*$this->publishes([
-                __DIR__.'/../resources/views' => base_path('resources/views/vendor/vt2'),
+                __DIR__.'/../resources/views' => base_path('resources/views/vendor/artjoker'),
             ], 'laravelubki.views');*/
 
             // Publishing assets.
             /*$this->publishes([
-                __DIR__.'/../resources/assets' => public_path('vendor/vt2'),
+                __DIR__.'/../resources/assets' => public_path('vendor/artjoker'),
             ], 'laravelubki.views');*/
 
             // Publishing the translation files.
             /*$this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/vt2'),
+                __DIR__.'/../resources/lang' => resource_path('lang/vendor/artjoker'),
             ], 'laravelubki.views');*/
 
             // Registering package commands.

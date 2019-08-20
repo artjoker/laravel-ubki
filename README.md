@@ -34,7 +34,7 @@ UBKI_TEST_REQUEST_URL=https://secure.ubki.ua:4040/b2_api_xml/ubki/xml
 ## Usage
 Add `IntegratorUbki`-trait to the model with client data:
 ```
-    use Vt2\LaravelUbki\Traits\IntegratorUbki;
+    use Artjoker\LaravelUbki\Traits\IntegratorUbki;
 
     class Loan extends Model
     {
@@ -64,7 +64,7 @@ This map establishes the correspondence between the attributes of your model and
 Add a new method `ubkiAttributes()` to the class to add the necessary attributes and fill them with data:
 
 ```
-    use Vt2\LaravelUbki\Traits\IntegratorUbki;
+    use Artjoker\LaravelUbki\Traits\IntegratorUbki;
 
     class Loan extends Model
     {
@@ -105,11 +105,11 @@ Please see the [changelog](changelog.md) for more information on what has change
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
-[ico-version]: https://img.shields.io/packagist/v/vt2/laravel-ubki.svg?style=flat-square
-[ico-downloads]: https://img.shields.io/packagist/dt/vt2/laravel-ubki.svg?style=flat-square
+[ico-version]: https://img.shields.io/packagist/v/artjoker/laravel-ubki.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/artjoker/laravel-ubki.svg?style=flat-square
 
-[link-packagist]: https://packagist.org/packages/vt2/laravel-ubki
-[link-downloads]: https://packagist.org/packages/vt2/laravel-ubki
+[link-packagist]: https://packagist.org/packages/artjoker/laravel-ubki
+[link-downloads]: https://packagist.org/packages/artjoker/laravel-ubki
 [link-ubki]: https://www.ubki.ua/
 [link-ubki-api]: https://sites.google.com/ubki.ua/doc/%D0%BE%D0%B1%D1%89%D0%B8%D0%B5-%D0%BF%D1%80%D0%B8%D0%BD%D1%86%D0%B8%D0%BF%D1%8B-%D0%B2%D0%B7%D0%B0%D0%B8%D0%BC%D0%BE%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D1%8F
 
