@@ -14,7 +14,7 @@ This package allows you to simply and easily work with the web-service UBKI.
 You can install this package via [Composer](http://getcomposer.org/): 
 
 ``` bash
-$ composer require vt2/laravel-ubki
+$ composer require artjoker/laravel-ubki
 ```
 Next, you need to run migrations:
 ```bash
