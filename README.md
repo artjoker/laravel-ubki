@@ -28,8 +28,10 @@ UBKI_ACCOUNT_LOGIN=
 UBKI_ACCOUNT_PASSWORD=
 UBKI_AUTH_URL=https://secure.ubki.ua/b2_api_xml/ubki/auth
 UBKI_REQUEST_URL=https://secure.ubki.ua/b2_api_xml/ubki/xml
+UBKI_UPLOAD_URL=https://secure.ubki.ua/upload/data/xml
 UBKI_TEST_AUTH_URL=https://secure.ubki.ua:4040/b2_api_xml/ubki/auth
 UBKI_TEST_REQUEST_URL=https://secure.ubki.ua:4040/b2_api_xml/ubki/xml
+UBKI_TEST_UPLOAD_URL=https://secure.ubki.ua:4040/upload/data/xml
 ```
 ## Usage
 Add `IntegratorUbki`-trait to the model with client data:
@@ -96,6 +98,11 @@ $result = $loan->ubki($params);
 - `$params['report']` - report alias, if you need other reports; 
 - `$params['request_id']` - your request ID (if necessary);
 - `$params['lang']` - search language;
+
+You can send the loan data to UBKI:
+```php
+$result = $loan->ubki_upload($params);
+```
 
 ## Change log
 
