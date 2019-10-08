@@ -28,33 +28,47 @@
         private $_request_id;
         private $_attributes;
         private $_lang_search;
+        private $_request_data;
+        private $_upload_url;
+        private $_req_type;
+        private $_upload = false;
 
         /**
          * Init
          */
         public function __construct()
         {
-            if (config('ubki.account_login') != null) {
-                $this->_account_login = config('ubki.account_login');
-            }
-
-            if (config('ubki.account_password') != null) {
-                $this->_account_password = config('ubki.account_password');
-            }
-
             if (config('ubki.test_mode') == true) {
+                if (config('ubki.test_account_login') != null) {
+                    $this->_account_login = config('ubki.test_account_login');
+                }
+                if (config('ubki.test_account_password') != null) {
+                    $this->_account_password = config('ubki.test_account_password');
+                }
                 if (config('ubki.test_request_url') != null) {
                     $this->_request_url = config('ubki.test_request_url');
                 }
                 if (config('ubki.test_auth_url') != null) {
                     $this->_auth_url = config('ubki.test_auth_url');
                 }
+                if (config('ubki.test_upload_url') != null) {
+                    $this->_upload_url = config('ubki.test_upload_url');
+                }
             } else {
+                if (config('ubki.account_login') != null) {
+                    $this->_account_login = config('ubki.account_login');
+                }
+                if (config('ubki.account_password') != null) {
+                    $this->_account_password = config('ubki.account_password');
+                }
                 if (config('ubki.request_url') != null) {
                     $this->_request_url = config('ubki.request_url');
                 }
                 if (config('ubki.auth_url') != null) {
                     $this->_auth_url = config('ubki.auth_url');
+                }
+                if (config('ubki.upload_url') != null) {
+                    $this->_upload_url = config('ubki.upload_url');
                 }
             }
             $this->_lang_search = config('ubki.lang_default');
@@ -69,16 +83,48 @@
          *                'report',      // alias of the type of report
          *                'request_id',  // Request ID from our side (if necessary)
          *                'lang'         // Language of search
+         *                'test'         // Enables the Test Mode
          *                ]
          *
          * @return mixed
          */
         public function getReport($attributes, $params = [])
         {
+            if (isset($params['test'])) {
+                if ($params['test'] == true) {
+                    if (config('ubki.test_account_login') != null) {
+                        $this->_account_login = config('ubki.test_account_login');
+                    }
+                    if (config('ubki.test_account_password') != null) {
+                        $this->_account_password = config('ubki.test_account_password');
+                    }
+                    if (config('ubki.test_request_url') != null) {
+                        $this->_request_url = config('ubki.test_request_url');
+                    }
+                    if (config('ubki.test_auth_url') != null) {
+                        $this->_auth_url = config('ubki.test_auth_url');
+                    }
+                } else {
+                    if (config('ubki.account_login') != null) {
+                        $this->_account_login = config('ubki.account_login');
+                    }
+                    if (config('ubki.account_password') != null) {
+                        $this->_account_password = config('ubki.account_password');
+                    }
+                    if (config('ubki.request_url') != null) {
+                        $this->_request_url = config('ubki.request_url');
+                    }
+                    if (config('ubki.auth_url') != null) {
+                        $this->_auth_url = config('ubki.auth_url');
+                    }
+                }
+            }
+
             $this->_attributes = $attributes;
             $this->_reason_key = LaravelUbki::REASON_CREDIT;
             $this->_request_id = time();
             $report_alias      = null;
+            $this->_upload     = false;
 
             if (isset($params['report'])) {
                 $report_alias = $params['report'];
@@ -96,22 +142,22 @@
             }
 
             $this->_request_xml = $this->_getXml($report_alias);
-
-            $result = $this->_queryXml();
+            $result             = $this->_queryXml();
 
             if ($result['status'] == 'error' && $result['errors']['errtype'] == $this::ERROR_BAD_TOKEN) {
                 UbkiToken::where('token', $this->_session_key)->first()->delete();
                 $this->_session_key = '';
+
+                $auth = $this->getSessionKey();
+                if ($auth['status'] == 'success') {
+                    $this->_session_key = $auth['token'];
+                }
+
+                $this->_request_xml = $this->_getXml($report_alias);
+                $result             = $this->_queryXml();
             }
 
-            $auth = $this->getSessionKey();
-            if ($auth['status'] == 'success') {
-                $this->_session_key = $auth['token'];
-            }
-
-            $this->_request_xml = $this->_getXml($report_alias);
-
-            return $this->_queryXml();
+            return $result;
         }
 
         /**
@@ -196,7 +242,7 @@
                 $result              = $this->_parseXml();
 
                 if (isset($result['errtype'])) {
-                    return ['status' => 'error', 'errors' => $result];
+                    return ['status' => 'error', 'errors' => $result, 'request_data' => $this->_request_data];
                 } else {
                     return ['status' => 'success', 'response' => $response->getBody()];
                 }
@@ -215,14 +261,36 @@
             $response = [];
             $res      = new SimpleXMLElement($this->_response_xml);
 
-            if (isset($res->auth)) {
-                foreach ($res->auth->attributes() as $key => $attr) {
-                    $response[$key] = (string)$attr;
+            if ($this->_upload == false) {
+                if (isset($res->auth)) {
+                    foreach ($res->auth->attributes() as $key => $attr) {
+                        $response[$key] = (string)$attr;
+                    }
+                } else {
+                    if (isset($res->tech->error)) {
+                        foreach ($res->tech->error->attributes() as $key => $attr) {
+                            $response[$key] = (string)$attr;
+                        }
+                    }
                 }
             } else {
-                if (isset($res->tech->error)) {
-                    foreach ($res->tech->error->attributes() as $key => $attr) {
+                if (isset($res->tech->sentdatainfo)) {
+                    foreach ($res->tech->sentdatainfo->attributes() as $key => $attr) {
                         $response[$key] = (string)$attr;
+                    }
+                }
+                if (isset($response['state'])) {
+                    if ($response['state'] == 'ok' || $response['state'] == 'nt') {
+                        $response['status'] = 'success';
+                        return $response;
+                    }
+                    if ($response['state'] == 'er') {
+                        $response['status'] = 'error';
+                        if (isset($res->tech->item)) {
+                            foreach ($res->tech->item->attributes() as $key => $attr) {
+                                $response[$key] = (string)$attr;
+                            }
+                        }
                     }
                 }
             }
@@ -320,6 +388,8 @@
 
             $req_request .= '</i></request>';
 
+            $this->_request_data = $req_request;
+
             return $req_xml = '<?xml version="1.0" encoding="utf-8"?>'
                 . '<doc>'
                 . '<ubki sessid="' . $this->_session_key . '">'
@@ -332,5 +402,298 @@
                 . '</doc>';
         }
 
+        /**
+         * Send the report to UBKI
+         *
+         * @param $attributes
+         * @param $params = [
+         *                'request_id',     // Request ID from our side (if necessary)
+         *                'upload_req_type' // upload_req_type (optional)
+         *                'lang'            // Language of upload (optional)
+         *                'test'            // Enables the Test Mode
+         *                ]
+         *
+         * @return mixed
+         */
+        public function sendReport($attributes, $params = [])
+        {
+            if (isset($params['test'])) {
+                if ($params['test'] == true) {
+                    if (config('ubki.test_account_login') != null) {
+                        $this->_account_login = config('ubki.test_account_login');
+                    }
+                    if (config('ubki.test_account_password') != null) {
+                        $this->_account_password = config('ubki.test_account_password');
+                    }
+                    if (config('ubki.test_upload_url') != null) {
+                        $this->_upload_url = config('ubki.test_upload_url');
+                    }
+                    if (config('ubki.test_auth_url') != null) {
+                        $this->_auth_url = config('ubki.test_auth_url');
+                    }
+                } else {
+                    if (config('ubki.account_login') != null) {
+                        $this->_account_login = config('ubki.account_login');
+                    }
+                    if (config('ubki.account_password') != null) {
+                        $this->_account_password = config('ubki.account_password');
+                    }
+                    if (config('ubki.upload_url') != null) {
+                        $this->_upload_url = config('ubki.upload_url');
+                    }
+                    if (config('ubki.auth_url') != null) {
+                        $this->_auth_url = config('ubki.auth_url');
+                    }
+                }
+            }
+            $this->_attributes = $attributes;
+            $this->_reason_key = LaravelUbki::REASON_UPLOAD;
+            $this->_request_id = time();
+            $this->_upload     = true;
+
+            $this->_req_type = config('ubki.upload_req_type');
+            if (isset($params['upload_req_type'])) {
+                $this->_req_type = $params['upload_req_type'];
+            }
+
+            if (isset($params['request_id'])) {
+                $this->_request_id = $params['request_id'];
+            }
+
+            if (isset($params['lang'])) {
+                $this->_lang_search = $params['lang'];
+            }
+
+            $auth = $this->getSessionKey();
+            if ($auth['status'] == 'success') {
+                $this->_session_key = $auth['token'];
+            }
+
+            $this->_request_xml = $this->_getXmlUpload();
+            $result             = $this->_queryXmlUpload();
+
+            if ($result['status'] == 'error' && $result['errors']['errtype'] == $this::ERROR_BAD_TOKEN) {
+                UbkiToken::where('token', $this->_session_key)->first()->delete();
+                $this->_session_key = '';
+
+                $auth = $this->getSessionKey();
+                if ($auth['status'] == 'success') {
+                    $this->_session_key = $auth['token'];
+                }
+
+                $this->_request_xml = $this->_getXmlUpload();
+                $result             = $this->_queryXmlUpload();
+            }
+
+            return $result;
+        }
+
+        /**
+         * Send a request to UBKI and get a response
+         *
+         * @return mixed
+         * @throws
+         */
+        private function _queryXmlUpload()
+        {
+            if ($this->_upload_url && $this->_request_xml) {
+                $client              = new Client();
+                $request             = new Request(
+                    'POST',
+                    $this->_upload_url,
+                    ['Content-Type' => 'text/xml; charset=UTF8'],
+                    $this->_request_xml
+                );
+                $response            = $client->send($request);
+                $this->_response_xml = $response->getBody();
+                $result              = $this->_parseXml();
+
+                if (isset($result['errtype'])) {
+                    return ['status' => 'error', 'errors' => $result, 'request_data' => $this->_request_data];
+                } else {
+                    return ['status' => 'success', 'response' => $response->getBody()];
+                }
+            }
+            return false;
+        }
+
+        /**
+         * Get xml for the uload to UBKI
+         *
+         * @return string
+         */
+        private function _getXmlUpload()
+        {
+            $sex   = (substr($this->_attributes[config('ubki.model_data.okpo')], 8, 1) % 2) ? 1 : 2;
+            $vdate = Carbon::parse($this->_attributes[config('ubki.model_data_upload.vdate')])->format('Y-m-d');
+
+            $req_request = '
+            <request version="1.0" '
+                . 'reqtype="' . $this->_req_type . '" '
+                . 'reqreason="' . $this->_reason_key . '" '
+                . 'reqdate="' . Carbon::now()->format('Y-m-d') . '" '
+                . 'reqidout="' . $this->_request_id . '" '
+                . 'reqsource="1">'
+                . '<ubkidata>'
+                . '<comp id="1">'
+                . '<cki inn="' . $this->_attributes[config('ubki.model_data.okpo')] . '" 
+                        lname="' . $this->_attributes[config('ubki.model_data.lname')] . '" 
+                        fname="' . $this->_attributes[config('ubki.model_data.fname')] . '" 
+                        mname="' . $this->_attributes[config('ubki.model_data.mname')] . '" 
+                        bdate="' . $this->_attributes[config('ubki.model_data.bdate')] . '" 
+                        reqlng="' . config('ubki.languages.' . $this->_lang_search) . '" 
+                        reqlngref="">'
+                . '<ident inn="' . $this->_attributes[config('ubki.model_data.okpo')] . '" 
+                        vdate="' . $vdate . '" 
+                        lng="' . config('ubki.languages.' . $this->_lang_search) . '" 
+                        lname="' . $this->_attributes[config('ubki.model_data.lname')] . '" 
+                        fname="' . $this->_attributes[config('ubki.model_data.fname')] . '" 
+                        mname="' . $this->_attributes[config('ubki.model_data.mname')] . '" 
+                        bdate="' . $this->_attributes[config('ubki.model_data.bdate')] . '" 
+                        csex="' . $sex . '" 
+                        cchild="" csexref="" familyref="" ceduc="" ceducref="" cgrag="" cgragref="" lngref="" sstateref="" ';
+
+            if (isset($this->_attributes[config('ubki.model_data_upload.family')])) {
+                $req_request .= 'family="' . $this->_attributes[config('ubki.model_data_upload.family')] . '" ';
+            }
+            if (isset($this->_attributes[config('ubki.model_data_upload.sstate')])) {
+                $req_request .= 'sstate="' . $this->_attributes[config('ubki.model_data_upload.sstate')] . '" ';
+            }
+
+            $req_request .= '></ident><doc 
+                vdate="' . $vdate . '"  
+                lng="' . config('ubki.languages.' . $this->_lang_search) . '" 
+                dtype="' . config('ubki.upload_doc_type') . '" 
+                dser= "' . $this->_attributes[config('ubki.model_data_upload.dser')] . '" 
+                dnom= "' . $this->_attributes[config('ubki.model_data_upload.dnom')] . '" 
+                dwho="' . $this->_attributes[config('ubki.model_data_upload.dwho')] . '" 
+                dwdt="' . $this->_attributes[config('ubki.model_data_upload.dwdt')] . '" 
+                dtyperef="" lngref="" dterm=""></doc>';
+
+            $req_request .= '<addr 
+                vdate="' . $vdate . '"  
+                lng="' . config('ubki.languages.' . $this->_lang_search) . '" 
+                adtype="2" lngref="" addrdirt="" adtyperef="" 
+                adcountry="' . config('ubki.upload_country') . '" 
+                adindex="' . $this->_attributes[config('ubki.model_data_upload.adindex')] . '" 
+                adstate="' . $this->_attributes[config('ubki.model_data_upload.adstate')] . '" 
+                adarea="" 
+                adcity="' . $this->_attributes[config('ubki.model_data_upload.adcity')] . '" 
+                adcitytype="" adcitytyperef="" 
+                adstreet="' . $this->_attributes[config('ubki.model_data_upload.adstreet')] . '" 
+                adhome="' . $this->_attributes[config('ubki.model_data_upload.adhome')] . '" 
+                adcorp="" ';
+            if (isset($this->_attributes[config('ubki.model_data_upload.adflat')])) {
+                $req_request .= 'adflat="' . $this->_attributes[config('ubki.model_data_upload.adflat')] . '" ';
+            } else {
+                $req_request .= 'adflat="" ';
+            }
+            $req_request .= '></addr>';
+
+            if (isset($this->_attributes[config('ubki.model_data_upload.adactual')])) {
+                if ($this->_attributes[config('ubki.model_data_upload.adactual')] == 1) {
+                    $req_request .= '<addr 
+                vdate="' . $vdate . '"  
+                lng="' . config('ubki.languages.' . $this->_lang_search) . '" 
+                adtype="1" lngref="" addrdirt="" adtyperef="" 
+                adcountry="' . config('ubki.upload_country') . '" 
+                adindex="' . $this->_attributes[config('ubki.model_data_upload.adindex2')] . '" 
+                adstate="' . $this->_attributes[config('ubki.model_data_upload.adstate2')] . '" 
+                adarea="" 
+                adcity="' . $this->_attributes[config('ubki.model_data_upload.adcity2')] . '" 
+                adcitytype=""  adcitytyperef="" 
+                adstreet="' . $this->_attributes[config('ubki.model_data_upload.adstreet2')] . '" 
+                adhome="' . $this->_attributes[config('ubki.model_data_upload.adhome2')] . '" 
+                adcorp="" ';
+                    if (isset($this->_attributes[config('ubki.model_data_upload.adflat2')])) {
+                        $req_request .= 'adflat="' . $this->_attributes[config('ubki.model_data_upload.adflat2')] . '" ';
+                    }
+                    $req_request .= '></addr>';
+                }
+            }
+
+            $req_request .= '</cki></comp><comp id="2"><crdeal 
+               inn="' . $this->_attributes[config('ubki.model_data.okpo')] . '" 
+               dlref="' . $this->_attributes[config('ubki.model_data_upload.dlref')] . '" 
+               lng="' . config('ubki.languages.' . $this->_lang_search) . '" lngref="" 
+               lname="' . $this->_attributes[config('ubki.model_data.lname')] . '" 
+               fname="' . $this->_attributes[config('ubki.model_data.fname')] . '" 
+               mname="' . $this->_attributes[config('ubki.model_data.mname')] . '" 
+               bdate="' . $this->_attributes[config('ubki.model_data.bdate')] . '" 
+               dlcelcred="' . config('ubki.upload_transaction_type') . '" dlcelcredref="" 
+               dlvidobes="' . config('ubki.upload_collateral') . '" dlvidobesref="" 
+               dlporpog="' . config('ubki.upload_repayment') . '"  dlporpogref="" 
+               dlcurr="' . config('ubki.upload_currency') . '" dlcurrref=""  
+               dlamt="' . $this->_attributes[config('ubki.model_data_upload.dlamt')] . '" 
+               dlrolesub="' . config('ubki.upload_subject') . '" dlrolesubref="" 
+               dlamtobes="0" dldonor="">';
+
+            $date_contract   = $this->_attributes[config('ubki.model_data_upload.dlds')];
+            $expiration_date = $this->_attributes[config('ubki.model_data_upload.dldpf')];
+            $upload_date     = $this->_attributes[config('ubki.model_data_upload.dldateclc')];
+            $close_date      = '';
+            $status          = $this->_attributes[config('ubki.model_data_upload.dlflstat')];
+            if ($status == 2 || $status == 3 || $status == 6 || $status == 7 || $status == 10) {
+                $date       = $this->_attributes[config('ubki.model_data_upload.dldff')];
+                $close_date = Carbon::parse($date)->format('Y-m-d');
+            }
+            $dlflpay = 0;
+            if ($status == 2 || $status == 3 || $status == 5) {
+                $dlflpay = 1;
+            }
+            $dlamtcur = 0;
+            if ($status == 1 || $status == 5) {
+                $dlamtcur = $this->_attributes[config('ubki.model_data_upload.dlamtcur')];
+            }
+
+            $dlflbrk = $dldayexp = 0;
+            if (isset($this->_attributes[config('ubki.model_data_upload.dlflbrk')])) {
+                $dlflbrk  = 1;
+                $dldayexp = $this->_attributes[config('ubki.model_data_upload.dldayexp')];
+            }
+
+            $req_request .= '<deallife 
+                dlref="' . $this->_attributes[config('ubki.model_data_upload.dlref')] . '" 
+                dlmonth="' . Carbon::parse($date_contract)->format('m') . '" 
+                dlyear="' . Carbon::parse($date_contract)->format('Y') . '" 
+                dlds="' . Carbon::parse($date_contract)->format('Y-m-d') . '" 
+                dldpf="' . Carbon::parse($expiration_date)->format('Y-m-d') . '" 
+                dldff="' . $close_date . '" 
+                dlflstat="' . $status . '" dlflstatref="" 
+                dlamtlim="0" 
+                dlamtpaym="0" 
+                dlamtcur="' . $dlamtcur . '" 
+                dlamtexp="0" 
+                dldayexp="' . $dldayexp . '" 
+                dlflpay="' . $dlflpay . '" dlflpayref=""
+                dlflbrk="' . $dlflbrk . '" dlflbrkref="" 
+                dlfluse="0" dlfluseref="Нет" 
+                dldateclc="' . Carbon::parse($upload_date)->format('Y-m-d') . '" ></deallife>';
+
+            $req_request .= '</crdeal></comp><comp id="10"><cont 
+                inn="' . $this->_attributes[config('ubki.model_data.okpo')] . '" 
+                vdate="' . $vdate . '" 
+                ctype="3" 
+                cval="+380' . $this->_attributes[config('ubki.model_data_upload.cval')] . '" 
+                ></cont></comp></ubkidata></request>';
+
+            $req_request = '<?xml version="1.0" encoding="utf-8"?>'
+                . '<doc>'
+                . '<ubki sessid="' . $this->_session_key . '">'
+                . '<req_envelope>'
+                . '<req_xml>'
+                // . base64_encode($req_request)
+                . $req_request
+                . '</req_xml>'
+                . '</req_envelope>'
+                . '</ubki>'
+                . '</doc>';
+
+            //dd($req_request);
+
+            $this->_request_data = $req_request;
+
+            return $req_xml = base64_encode($req_request);
+        }
 
     }
