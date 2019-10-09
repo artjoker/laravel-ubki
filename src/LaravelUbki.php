@@ -563,7 +563,7 @@
             $req_request .= '></ident><doc 
                 vdate="' . $vdate . '"  
                 lng="' . config('ubki.languages.' . $this->_lang_search) . '" 
-                dtype="' . config('ubki.upload_doc_type') . '" 
+                dtype="' . $this->_attributes[config('ubki.model_data_upload.dtype')] . '" 
                 dser= "' . $this->_attributes[config('ubki.model_data_upload.dser')] . '" 
                 dnom= "' . $this->_attributes[config('ubki.model_data_upload.dnom')] . '" 
                 dwho="' . $this->_attributes[config('ubki.model_data_upload.dwho')] . '" 
@@ -646,10 +646,11 @@
                 $dlamtcur = $this->_attributes[config('ubki.model_data_upload.dlamtcur')];
             }
 
-            $dlflbrk = $dldayexp = 0;
+            $dlflbrk = $dldayexp = $dlamtexp = 0;
             if (isset($this->_attributes[config('ubki.model_data_upload.dlflbrk')])) {
                 $dlflbrk  = 1;
                 $dldayexp = $this->_attributes[config('ubki.model_data_upload.dldayexp')];
+                $dlamtexp = $this->_attributes[config('ubki.model_data_upload.dlamtcur')];
             }
 
             $req_request .= '<deallife 
@@ -663,7 +664,7 @@
                 dlamtlim="0" 
                 dlamtpaym="0" 
                 dlamtcur="' . $dlamtcur . '" 
-                dlamtexp="0" 
+                dlamtexp="' . $dlamtexp . '" 
                 dldayexp="' . $dldayexp . '" 
                 dlflpay="' . $dlflpay . '" dlflpayref=""
                 dlflbrk="' . $dlflbrk . '" dlflbrkref="" 
