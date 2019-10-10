@@ -559,6 +559,12 @@
             if (isset($this->_attributes[config('ubki.model_data_upload.sstate')])) {
                 $req_request .= 'sstate="' . $this->_attributes[config('ubki.model_data_upload.sstate')] . '" ';
             }
+            $dterm = '';
+            if ($this->_attributes[config('ubki.model_data_upload.dtype')] == 17) {
+                if ($this->_attributes[config('ubki.model_data_upload.dterm')] != '') {
+                    $dterm = Carbon::parse($this->_attributes[config('ubki.model_data_upload.dterm')])->format('Y-m-d');
+                }
+            }
 
             $req_request .= '></ident><doc 
                 vdate="' . $vdate . '"  
@@ -568,7 +574,8 @@
                 dnom= "' . $this->_attributes[config('ubki.model_data_upload.dnom')] . '" 
                 dwho="' . $this->_attributes[config('ubki.model_data_upload.dwho')] . '" 
                 dwdt="' . $this->_attributes[config('ubki.model_data_upload.dwdt')] . '" 
-                dtyperef="" lngref="" dterm=""></doc>';
+                dterm="' . $dterm . '" 
+                dtyperef="" lngref=""></doc>';
 
             $req_request .= '<addr 
                 vdate="' . $vdate . '"  
