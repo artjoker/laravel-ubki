@@ -559,21 +559,28 @@
             if (isset($this->_attributes[config('ubki.model_data_upload.sstate')])) {
                 $req_request .= 'sstate="' . $this->_attributes[config('ubki.model_data_upload.sstate')] . '" ';
             }
+
             $dterm = '';
+            $dser = $this->_attributes[config('ubki.model_data_upload.dser')];
+            $dwho  = $this->_attributes[config('ubki.model_data_upload.dwho')];
             if ($this->_attributes[config('ubki.model_data_upload.dtype')] == 17) {
                 if ($this->_attributes[config('ubki.model_data_upload.dterm')] != '') {
                     $dterm = Carbon::parse($this->_attributes[config('ubki.model_data_upload.dterm')])->format('Y-m-d');
                 }
+                if($dwho == ''){
+                    $dwho = '0';
+                }
+                $dser = '';
             }
 
             $req_request .= '></ident><doc 
                 vdate="' . $vdate . '"  
                 lng="' . config('ubki.languages.' . $this->_lang_search) . '" 
-                dtype="' . $this->_attributes[config('ubki.model_data_upload.dtype')] . '" 
-                dser= "' . $this->_attributes[config('ubki.model_data_upload.dser')] . '" 
+                dtype="' . $this->_attributes[config('ubki.model_data_upload.dtype')] . '"
+                dser= "' . $dser . '" 
                 dnom= "' . $this->_attributes[config('ubki.model_data_upload.dnom')] . '" 
-                dwho="' . $this->_attributes[config('ubki.model_data_upload.dwho')] . '" 
                 dwdt="' . $this->_attributes[config('ubki.model_data_upload.dwdt')] . '" 
+                dwho="' . $dwho . '" 
                 dterm="' . $dterm . '" 
                 dtyperef="" lngref=""></doc>';
 
