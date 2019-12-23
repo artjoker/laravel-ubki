@@ -501,7 +501,8 @@
                 $request             = new Request(
                     'POST',
                     $this->_upload_url,
-                    ['Content-Type' => 'text/xml; charset=UTF8'],
+                    ['Accept' => 'application/xml',
+                     'Content-Type' => 'application/xml'],
                     $this->_request_xml
                 );
                 $response            = $client->send($request);
