@@ -32,6 +32,7 @@
         private $_upload_url;
         private $_req_type;
         private $_upload = false;
+        private $_reload_session = false;
 
         /**
          * Init
@@ -145,13 +146,15 @@
             $result             = $this->_queryXml();
 
             if ($result['status'] == 'error' && $result['errors']['errtype'] == $this::ERROR_BAD_TOKEN) {
-                UbkiToken::where('token', $this->_session_key)->first()->delete();
+                //UbkiToken::where('token', $this->_session_key)->first()->delete();
                 $this->_session_key = '';
+                $this->_reload_session = true;
 
                 $auth = $this->getSessionKey();
                 if ($auth['status'] == 'success') {
                     $this->_session_key = $auth['token'];
                 }
+                $this->_reload_session = false;
 
                 $this->_request_xml = $this->_getXml($report_alias);
                 $result             = $this->_queryXml();
@@ -167,13 +170,14 @@
          */
         public function getSessionKey()
         {
-            $ubki = UbkiToken::where('created_at', '>', Carbon::now()->startOfDay()->toDateTimeString())
-                ->where('token', '!=', null)->get()->last();
+            if($this->_reload_session == false){
+                $ubki = UbkiToken::where('created_at', '>', Carbon::now()->startOfDay()->toDateTimeString())
+                    ->where('token', '!=', null)->get()->last();
 
-            if ($ubki) {
-                return ['status' => 'success', 'token' => $ubki->token];
+                if ($ubki) {
+                    return ['status' => 'success', 'token' => $ubki->token];
+                }
             }
-
             $this->_getSessionKey();
             $result = $this->_parseXml();
 
@@ -242,7 +246,8 @@
                 $result              = $this->_parseXml();
 
                 if (isset($result['errtype'])) {
-                    return ['status' => 'error', 'errors' => $result, 'request_data' => $this->_request_data];
+                    $res = new SimpleXMLElement($this->_response_xml);
+                    return ['status' => 'error', 'errors' => $result, 'request_data' => $this->_request_data, 'response_data' => $res];
                 } else {
                     return ['status' => 'success', 'response' => $response->getBody()];
                 }
@@ -274,21 +279,33 @@
                     }
                 }
             } else {
-                if (isset($res->tech->sentdatainfo)) {
-                    foreach ($res->tech->sentdatainfo->attributes() as $key => $attr) {
+                if (isset($res->auth)) {
+                    foreach ($res->auth->attributes() as $key => $attr) {
                         $response[$key] = (string)$attr;
                     }
-                }
-                if (isset($response['state'])) {
-                    if ($response['state'] == 'ok' || $response['state'] == 'nt') {
-                        $response['status'] = 'success';
-                        return $response;
-                    }
-                    if ($response['state'] == 'er') {
-                        $response['status'] = 'error';
-                        if (isset($res->tech->item)) {
-                            foreach ($res->tech->item->attributes() as $key => $attr) {
+                } else {
+                    if (isset($res->tech->error)) {
+                        foreach ($res->tech->error->attributes() as $key => $attr) {
+                            $response[$key] = (string)$attr;
+                        }
+                    } else {
+                        if (isset($res->tech->sentdatainfo)) {
+                            foreach ($res->tech->sentdatainfo->attributes() as $key => $attr) {
                                 $response[$key] = (string)$attr;
+                            }
+                        }
+                        if (isset($response['state'])) {
+                            if ($response['state'] == 'ok' || $response['state'] == 'nt') {
+                                $response['status'] = 'success';
+                                return $response;
+                            }
+                            if ($response['state'] == 'er') {
+                                $response['status'] = 'error';
+                                if (isset($res->tech->item)) {
+                                    foreach ($res->tech->item->attributes() as $key => $attr) {
+                                        $response[$key] = (string)$attr;
+                                    }
+                                }
                             }
                         }
                     }
@@ -473,13 +490,15 @@
             $result             = $this->_queryXmlUpload();
 
             if ($result['status'] == 'error' && $result['errors']['errtype'] == $this::ERROR_BAD_TOKEN) {
-                UbkiToken::where('token', $this->_session_key)->first()->delete();
+                //UbkiToken::where('token', $this->_session_key)->first()->delete();
                 $this->_session_key = '';
+                $this->_reload_session = true;
 
                 $auth = $this->getSessionKey();
                 if ($auth['status'] == 'success') {
                     $this->_session_key = $auth['token'];
                 }
+                $this->_reload_session = false;
 
                 $this->_request_xml = $this->_getXmlUpload();
                 $result             = $this->_queryXmlUpload();
@@ -501,7 +520,7 @@
                 $request             = new Request(
                     'POST',
                     $this->_upload_url,
-                    ['Accept' => 'application/xml',
+                    ['Accept'       => 'application/xml',
                      'Content-Type' => 'application/xml'],
                     $this->_request_xml
                 );
@@ -510,7 +529,8 @@
                 $result              = $this->_parseXml();
 
                 if (isset($result['errtype'])) {
-                    return ['status' => 'error', 'errors' => $result, 'request_data' => $this->_request_data];
+                    $res = new SimpleXMLElement($this->_response_xml);
+                    return ['status' => 'error', 'errors' => $result, 'request_data' => $this->_request_data, 'response_data' => $res];
                 } else {
                     return ['status' => 'success', 'response' => $response->getBody()];
                 }
@@ -562,13 +582,13 @@
             }
 
             $dterm = '';
-            $dser = $this->_attributes[config('ubki.model_data_upload.dser')];
+            $dser  = $this->_attributes[config('ubki.model_data_upload.dser')];
             $dwho  = $this->_attributes[config('ubki.model_data_upload.dwho')];
             if ($this->_attributes[config('ubki.model_data_upload.dtype')] == 17) {
                 if ($this->_attributes[config('ubki.model_data_upload.dterm')] != '') {
                     $dterm = Carbon::parse($this->_attributes[config('ubki.model_data_upload.dterm')])->format('Y-m-d');
                 }
-                if($dwho == ''){
+                if ($dwho == '') {
                     $dwho = '0';
                 }
                 $dser = '';
