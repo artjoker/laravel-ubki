@@ -147,7 +147,7 @@
 
             if ($result['status'] == 'error' && $result['errors']['errtype'] == $this::ERROR_BAD_TOKEN) {
                 //UbkiToken::where('token', $this->_session_key)->first()->delete();
-                $this->_session_key = '';
+                $this->_session_key    = '';
                 $this->_reload_session = true;
 
                 $auth = $this->getSessionKey();
@@ -170,7 +170,7 @@
          */
         public function getSessionKey()
         {
-            if($this->_reload_session == false){
+            if ($this->_reload_session == false) {
                 $ubki = UbkiToken::where('created_at', '>', Carbon::now()->startOfDay()->toDateTimeString())
                     ->where('token', '!=', null)->get()->last();
 
@@ -491,7 +491,7 @@
 
             if ($result['status'] == 'error' && $result['errors']['errtype'] == $this::ERROR_BAD_TOKEN) {
                 //UbkiToken::where('token', $this->_session_key)->first()->delete();
-                $this->_session_key = '';
+                $this->_session_key    = '';
                 $this->_reload_session = true;
 
                 $auth = $this->getSessionKey();
@@ -671,7 +671,13 @@
             if ($status == 2 || $status == 3 || $status == 6 || $status == 7 || $status == 10) {
                 $date       = $this->_attributes[config('ubki.model_data_upload.dldff')];
                 $close_date = Carbon::parse($date)->format('Y-m-d');
+                $dlmonth    = Carbon::parse($date)->format('m');
+                $dlyear     = Carbon::parse($date)->format('Y');
+            } else {
+                $dlmonth = Carbon::now()->format('m');
+                $dlyear  = Carbon::now()->format('Y');
             }
+
             $dlflpay = 0;
             if ($status == 2 || $status == 3 || $status == 5) {
                 $dlflpay = 1;
@@ -690,8 +696,8 @@
 
             $req_request .= '<deallife 
                 dlref="' . $this->_attributes[config('ubki.model_data_upload.dlref')] . '" 
-                dlmonth="' . Carbon::now()->subMonth()->format('m') . '" 
-                dlyear="' . Carbon::now()->subMonth()->format('Y') . '" 
+                dlmonth="' . $dlmonth . '" 
+                dlyear="' . $dlyear . '" 
                 dlds="' . Carbon::parse($date_contract)->format('Y-m-d') . '" 
                 dldpf="' . Carbon::parse($expiration_date)->format('Y-m-d') . '" 
                 dldff="' . $close_date . '" 
