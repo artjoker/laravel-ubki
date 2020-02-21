@@ -690,8 +690,8 @@
 
             $req_request .= '<deallife 
                 dlref="' . $this->_attributes[config('ubki.model_data_upload.dlref')] . '" 
-                dlmonth="' . Carbon::parse($date_contract)->format('m') . '" 
-                dlyear="' . Carbon::parse($date_contract)->format('Y') . '" 
+                dlmonth="' . Carbon::now()->subMonth()->format('m') . '" 
+                dlyear="' . Carbon::now()->subMonth()->format('Y') . '" 
                 dlds="' . Carbon::parse($date_contract)->format('Y-m-d') . '" 
                 dldpf="' . Carbon::parse($expiration_date)->format('Y-m-d') . '" 
                 dldff="' . $close_date . '" 
