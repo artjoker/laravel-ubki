@@ -45,6 +45,44 @@
         'upload_url'              => env('UBKI_UPLOAD_URL', 'https://secure.ubki.ua/upload/data/xml'),
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Second Login of the account UBKI
+        |--------------------------------------------------------------------------
+        */
+        'second_account_login'    => env('UBKI_SECOND_ACCOUNT_LOGIN', null),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Second Password of the account UBKI
+        |--------------------------------------------------------------------------
+        */
+        'second_account_password' => env('UBKI_SECOND_ACCOUNT_PASSWORD', null),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Second Authorization service URL
+        |--------------------------------------------------------------------------
+        */
+        'second_auth_url'         => env('UBKI_SECOND_AUTH_URL', 'https://secure.ubki.ua/b2_api_xml/ubki/auth'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Second Request URL
+        |--------------------------------------------------------------------------
+        */
+        'second_request_url'      => env('UBKI_SECOND_REQUEST_URL', 'https://secure.ubki.ua/b2_api_xml/ubki/xml'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Second Upload URL
+        |--------------------------------------------------------------------------
+        */
+        'second_upload_url'       => env('UBKI_SECOND_UPLOAD_URL', 'https://secure.ubki.ua/upload/data/xml'),
+
+
+
+
         //-------------- TEST MODE ------------------------------------------------
 
         /*
