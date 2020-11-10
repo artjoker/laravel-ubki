@@ -5,6 +5,7 @@
     use Carbon\Carbon;
     use GuzzleHttp\Client;
     use GuzzleHttp\Psr7\Request;
+    use Illuminate\Database\Eloquent\Builder;
     use SimpleXMLElement;
     use Artjoker\LaravelUbki\Models\UbkiToken;
 
@@ -33,6 +34,7 @@
         private $_req_type;
         private $_upload = false;
         private $_reload_session = false;
+        private $_multiple_accounts = false;
 
         /**
          * Init
@@ -105,6 +107,19 @@
                     if (config('ubki.test_auth_url') != null) {
                         $this->_auth_url = config('ubki.test_auth_url');
                     }
+                } else if (isset($params['use_second_account_login']) && $params['use_second_account_login'] == true) {
+                    if (config('ubki.second_account_login') != null) {
+                        $this->_account_login = config('ubki.second_account_login');
+                    }
+                    if (config('ubki.second_account_password') != null) {
+                        $this->_account_password = config('ubki.second_account_password');
+                    }
+                    if (config('ubki.second_request_url') != null) {
+                        $this->_request_url = config('ubki.second_request_url');
+                    }
+                    if (config('ubki.second_auth_url') != null) {
+                        $this->_auth_url = config('ubki.second_auth_url');
+                    }
                 } else {
                     if (config('ubki.account_login') != null) {
                         $this->_account_login = config('ubki.account_login');
@@ -119,6 +134,12 @@
                         $this->_auth_url = config('ubki.auth_url');
                     }
                 }
+            }
+
+            $this->_multiple_accounts = false;
+
+            if (isset($params['use_second_account_login'])) {
+                $this->_multiple_accounts = true;
             }
 
             $this->_attributes = $attributes;
@@ -172,7 +193,12 @@
         {
             if ($this->_reload_session == false) {
                 $ubki = UbkiToken::where('created_at', '>', Carbon::now()->startOfDay()->toDateTimeString())
-                    ->where('token', '!=', null)->get()->last();
+                    ->where('token', '!=', null)
+                    ->when($this->_multiple_accounts, function (Builder $query) {
+                        $query->where('account_login', $this->_account_login);
+                    })
+                    ->get()
+                    ->last();
 
                 if ($ubki) {
                     return ['status' => 'success', 'token' => $ubki->token];
@@ -181,21 +207,23 @@
             $this->_getSessionKey();
             $result = $this->_parseXml();
 
+            if ($this->_multiple_accounts) {
+                $data['account_login'] = $this->_account_login;
+            }
+
             if (isset($result['errcode'])) {
-                UbkiToken::create([
-                    'token'      => null,
-                    'error_code' => $result['errcode'],
-                    'response'   => $this->_response_xml,
-                ]);
+                $data['token'] = null;
+                $data['error_code'] = $result['errcode'];
+                $data['response'] = $this->_response_xml;
+                UbkiToken::create($data);
                 return ['status' => 'error', 'errors' => $result];
             }
 
             if (isset($result['sessid'])) {
-                UbkiToken::create([
-                    'token'      => $result['sessid'],
-                    'error_code' => null,
-                    'response'   => $this->_response_xml,
-                ]);
+                $data['token'] = $result['sessid'];
+                $data['error_code'] = null;
+                $data['response'] = $this->_response_xml;
+                UbkiToken::create($data);
                 return ['status' => 'success', 'token' => $result['sessid'], 'response' => $result];
             }
             return false;
@@ -448,6 +476,19 @@
                     if (config('ubki.test_auth_url') != null) {
                         $this->_auth_url = config('ubki.test_auth_url');
                     }
+                } else if (isset($params['use_second_account_login']) && $params['use_second_account_login'] == true) {
+                    if (config('ubki.second_account_login') != null) {
+                        $this->_account_login = config('ubki.second_account_login');
+                    }
+                    if (config('ubki.second_account_password') != null) {
+                        $this->_account_password = config('ubki.second_account_password');
+                    }
+                    if (config('ubki.second_request_url') != null) {
+                        $this->_request_url = config('ubki.second_request_url');
+                    }
+                    if (config('ubki.second_auth_url') != null) {
+                        $this->_auth_url = config('ubki.second_auth_url');
+                    }
                 } else {
                     if (config('ubki.account_login') != null) {
                         $this->_account_login = config('ubki.account_login');
@@ -463,6 +504,13 @@
                     }
                 }
             }
+
+            $this->_multiple_accounts = false;
+
+            if (isset($params['use_second_account_login'])) {
+                $this->_multiple_accounts = true;
+            }
+
             $this->_attributes = $attributes;
             $this->_reason_key = LaravelUbki::REASON_UPLOAD;
             $this->_request_id = time();

@@ -6,5 +6,5 @@
 
     class UbkiToken extends Model
     {
-        protected $fillable = ['token', 'error_code', 'response'];
+        protected $fillable = ['token', 'error_code', 'response', 'account_login'];
     }
