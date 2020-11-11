@@ -9,6 +9,47 @@
 
 This package allows you to simply and easily work with the web-service UBKI.
 
+## Migration to version 3
+In this version we added possibility to use two UBKI accounts.
+
+To use this possibility you should update your config file and add new migration.
+
+Before publishing config you should remove previous config file.
+``` bash
+$ php artisan vendor:publish --tag="laravelubki.config"
+$ php artisan vendor:publish --tag="laravelubki.migrations"
+```
+
+Next, you need to run migrations:
+```bash
+$ php artisan migrate
+```
+
+add environment variables (`.env`)
+```
+UBKI_SECOND_ACCOUNT_LOGIN=
+UBKI_SECOND_ACCOUNT_PASSWORD=
+```
+
+For switching between accounts you should add to params:
+ - to select second account 
+```php
+$params = [
+    'test' => false,
+    'use_second_account_login' => true
+];
+```
+
+ - to select main account 
+```php
+$params = [
+    'test' => false,
+    'use_second_account_login' => false
+];
+```
+
+if you not select what account to use, last used account will be executed. 
+
 ## Installation
 
 You can install this package via [Composer](http://getcomposer.org/): 

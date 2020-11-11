@@ -66,6 +66,11 @@
                 __DIR__ . '/../config/ubki.php' => config_path('ubki.php'),
             ], 'laravelubki.config');
 
+            // Publish migrations
+            $this->publishes([
+                __DIR__.'/../database/migrations/' => database_path('/migrations')
+            ], 'laravelubki.migrations');
+
             // Publishing the views.
             /*$this->publishes([
                 __DIR__.'/../resources/views' => base_path('resources/views/vendor/artjoker'),
