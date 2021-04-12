@@ -722,8 +722,8 @@
                 $dlmonth    = Carbon::parse($date)->format('m');
                 $dlyear     = Carbon::parse($date)->format('Y');
             } else {
-                $dlmonth = Carbon::now()->format('m');
-                $dlyear  = Carbon::now()->format('Y');
+                $dlmonth = Carbon::parse($upload_date)->format('m');
+                $dlyear  = Carbon::parse($upload_date)->format('Y');
             }
 
             $dlflpay = 0;
@@ -778,8 +778,6 @@
                 . '</req_envelope>'
                 . '</ubki>'
                 . '</doc>';
-
-            //dd($req_request);
 
             $this->_request_data = $req_request;
 

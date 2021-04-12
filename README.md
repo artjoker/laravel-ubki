@@ -114,7 +114,7 @@ Add a new method `ubkiAttributes()` to the class to add the necessary attributes
         use IntegratorUbki;
         ...
         
-        public function ubkiAttributes()
+        public function ubkiAttributes($params = [])
         {
             $client_data = json_decode($this->attributes['client_data']);
             $this->attributes['inn']        = trim($client_data->code); 
@@ -144,6 +144,7 @@ You can send the loan data to UBKI:
 ```php
 $result = $loan->ubki_upload($params);
 ```
+`$params` - will be passed to the ubkiAttributes() method in the model.
 
 ## Change log
 

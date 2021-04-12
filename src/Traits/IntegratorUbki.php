@@ -32,7 +32,7 @@
         public function ubki_upload($params = [])
         {
             if (method_exists($this, 'ubkiAttributes')) {
-                $this->ubkiAttributes();
+                $this->ubkiAttributes($params);
             }
             return LaravelUbki::sendReport($this->getAttributes(), $params);
         }
