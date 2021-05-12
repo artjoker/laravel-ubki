@@ -100,6 +100,7 @@ Set the necessary the mapping variables in `config/ubki.php`:
   'dnom'  => 'passport_num',  // Номер паспорта или номер ID-карты
   'ctype' => 'contact_type',  // Тип контакта (см. справочник "Тип контакта")
   'cval'  => 'contact_val',   // Значение контакта (например - "+380951111111")
+  'foto'  => 'foto',          // <base64(Фото)>
 ],
 ```
 This map establishes the correspondence between the attributes of your model and the required query fields in UBKI.
