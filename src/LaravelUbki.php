@@ -107,31 +107,33 @@
                     if (config('ubki.test_auth_url') != null) {
                         $this->_auth_url = config('ubki.test_auth_url');
                     }
-                } else if (isset($params['use_second_account_login']) && $params['use_second_account_login'] == true) {
-                    if (config('ubki.second_account_login') != null) {
-                        $this->_account_login = config('ubki.second_account_login');
-                    }
-                    if (config('ubki.second_account_password') != null) {
-                        $this->_account_password = config('ubki.second_account_password');
-                    }
-                    if (config('ubki.second_request_url') != null) {
-                        $this->_request_url = config('ubki.second_request_url');
-                    }
-                    if (config('ubki.second_auth_url') != null) {
-                        $this->_auth_url = config('ubki.second_auth_url');
-                    }
                 } else {
-                    if (config('ubki.account_login') != null) {
-                        $this->_account_login = config('ubki.account_login');
-                    }
-                    if (config('ubki.account_password') != null) {
-                        $this->_account_password = config('ubki.account_password');
-                    }
-                    if (config('ubki.request_url') != null) {
-                        $this->_request_url = config('ubki.request_url');
-                    }
-                    if (config('ubki.auth_url') != null) {
-                        $this->_auth_url = config('ubki.auth_url');
+                    if (isset($params['use_second_account_login']) && $params['use_second_account_login'] == true) {
+                        if (config('ubki.second_account_login') != null) {
+                            $this->_account_login = config('ubki.second_account_login');
+                        }
+                        if (config('ubki.second_account_password') != null) {
+                            $this->_account_password = config('ubki.second_account_password');
+                        }
+                        if (config('ubki.second_request_url') != null) {
+                            $this->_request_url = config('ubki.second_request_url');
+                        }
+                        if (config('ubki.second_auth_url') != null) {
+                            $this->_auth_url = config('ubki.second_auth_url');
+                        }
+                    } else {
+                        if (config('ubki.account_login') != null) {
+                            $this->_account_login = config('ubki.account_login');
+                        }
+                        if (config('ubki.account_password') != null) {
+                            $this->_account_password = config('ubki.account_password');
+                        }
+                        if (config('ubki.request_url') != null) {
+                            $this->_request_url = config('ubki.request_url');
+                        }
+                        if (config('ubki.auth_url') != null) {
+                            $this->_auth_url = config('ubki.auth_url');
+                        }
                     }
                 }
             }
@@ -212,17 +214,17 @@
             }
 
             if (isset($result['errcode'])) {
-                $data['token'] = null;
+                $data['token']      = null;
                 $data['error_code'] = $result['errcode'];
-                $data['response'] = $this->_response_xml;
+                $data['response']   = $this->_response_xml;
                 UbkiToken::create($data);
                 return ['status' => 'error', 'errors' => $result];
             }
 
             if (isset($result['sessid'])) {
-                $data['token'] = $result['sessid'];
+                $data['token']      = $result['sessid'];
                 $data['error_code'] = null;
-                $data['response'] = $this->_response_xml;
+                $data['response']   = $this->_response_xml;
                 UbkiToken::create($data);
                 return ['status' => 'success', 'token' => $result['sessid'], 'response' => $result];
             }
@@ -375,6 +377,9 @@
                 case 'passport':
                     return $this->_prepare(config('ubki.reports.passport'));
                     break;
+                case 'photo_verify':
+                    return $this->_prepare(config('ubki.reports.photo_verify'));
+                    break;
             }
         }
 
@@ -403,7 +408,7 @@
                         orgname=""
                      ></ident>';
 
-            if ($cod_report != config('ubki.reports.passport')) {
+            if ($cod_report != config('ubki.reports.passport') && $cod_report != config('ubki.reports.photo_verify')) {
                 $req_request .= '<spd inn="' . $this->_attributes[config('ubki.model_data.okpo')] . '" />';
 
                 $req_request .= '<docs><doc 
@@ -429,6 +434,10 @@
                         pmname = "' . $this->_attributes[config('ubki.model_data.mname')] . '"
                         pbdate = "' . $this->_attributes[config('ubki.model_data.bdate')] . '"
                 ></mvd >';
+            }
+
+            if ($cod_report == config('ubki.reports.photo_verify')) {
+                $req_request .= '<fotoverif freqtype="2" facelogic="3"  fotoext="jpg" inn="' . $this->_attributes[config('ubki.model_data.okpo')] . '" phone="' . $this->_attributes[config('ubki.model_data.cval')] . '" foto="' . $this->_attributes[config('ubki.model_data.foto')] . '" />';
             }
 
             $req_request .= '</i></request>';
@@ -476,31 +485,33 @@
                     if (config('ubki.test_auth_url') != null) {
                         $this->_auth_url = config('ubki.test_auth_url');
                     }
-                } else if (isset($params['use_second_account_login']) && $params['use_second_account_login'] == true) {
-                    if (config('ubki.second_account_login') != null) {
-                        $this->_account_login = config('ubki.second_account_login');
-                    }
-                    if (config('ubki.second_account_password') != null) {
-                        $this->_account_password = config('ubki.second_account_password');
-                    }
-                    if (config('ubki.second_request_url') != null) {
-                        $this->_request_url = config('ubki.second_request_url');
-                    }
-                    if (config('ubki.second_auth_url') != null) {
-                        $this->_auth_url = config('ubki.second_auth_url');
-                    }
                 } else {
-                    if (config('ubki.account_login') != null) {
-                        $this->_account_login = config('ubki.account_login');
-                    }
-                    if (config('ubki.account_password') != null) {
-                        $this->_account_password = config('ubki.account_password');
-                    }
-                    if (config('ubki.upload_url') != null) {
-                        $this->_upload_url = config('ubki.upload_url');
-                    }
-                    if (config('ubki.auth_url') != null) {
-                        $this->_auth_url = config('ubki.auth_url');
+                    if (isset($params['use_second_account_login']) && $params['use_second_account_login'] == true) {
+                        if (config('ubki.second_account_login') != null) {
+                            $this->_account_login = config('ubki.second_account_login');
+                        }
+                        if (config('ubki.second_account_password') != null) {
+                            $this->_account_password = config('ubki.second_account_password');
+                        }
+                        if (config('ubki.second_request_url') != null) {
+                            $this->_request_url = config('ubki.second_request_url');
+                        }
+                        if (config('ubki.second_auth_url') != null) {
+                            $this->_auth_url = config('ubki.second_auth_url');
+                        }
+                    } else {
+                        if (config('ubki.account_login') != null) {
+                            $this->_account_login = config('ubki.account_login');
+                        }
+                        if (config('ubki.account_password') != null) {
+                            $this->_account_password = config('ubki.account_password');
+                        }
+                        if (config('ubki.upload_url') != null) {
+                            $this->_upload_url = config('ubki.upload_url');
+                        }
+                        if (config('ubki.auth_url') != null) {
+                            $this->_auth_url = config('ubki.auth_url');
+                        }
                     }
                 }
             }
