@@ -140,6 +140,7 @@ $result = $loan->ubki($params);
 - `$params['report']` - report alias, if you need other reports; 
 - `$params['request_id']` - your request ID (if necessary);
 - `$params['lang']` - search language;
+- `$params['delete_all_history']` - set true if you want delete all history;
 
 You can send the loan data to UBKI:
 ```php

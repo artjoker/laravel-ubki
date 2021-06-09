@@ -35,6 +35,7 @@
         private $_upload = false;
         private $_reload_session = false;
         private $_multiple_accounts = false;
+        private $_delete_all_history = false;
 
         /**
          * Init
@@ -532,6 +533,13 @@
                 $this->_req_type = $params['upload_req_type'];
             }
 
+            $this->_delete_all_history = false;
+
+            if (isset($params['delete_all_history']) && $params['delete_all_history'] == true) {
+                $this->_delete_all_history = true;
+                $this->_req_type = 'd';
+            }
+
             if (isset($params['request_id'])) {
                 $this->_request_id = $params['request_id'];
             }
@@ -753,7 +761,8 @@
                 $dlamtexp = $this->_attributes[config('ubki.model_data_upload.dlamtcur')];
             }
 
-            $req_request .= '<deallife 
+            if (!$this->_delete_all_history) {
+                $req_request .= '<deallife 
                 dlref="' . $this->_attributes[config('ubki.model_data_upload.dlref')] . '" 
                 dlmonth="' . $dlmonth . '" 
                 dlyear="' . $dlyear . '" 
@@ -770,6 +779,7 @@
                 dlflbrk="' . $dlflbrk . '" dlflbrkref="" 
                 dlfluse="0" dlfluseref="Нет" 
                 dldateclc="' . Carbon::parse($upload_date)->format('Y-m-d') . '" ></deallife>';
+            }
 
             $req_request .= '</crdeal></comp><comp id="10"><cont 
                 inn="' . $this->_attributes[config('ubki.model_data.okpo')] . '" 
