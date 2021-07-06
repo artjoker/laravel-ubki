@@ -445,12 +445,16 @@
 
             $this->_request_data = $req_request;
 
+            if ($cod_report != config('ubki.reports.photo_verify')) {
+                $req_request = base64_encode($req_request);
+            }
+
             return $req_xml = '<?xml version="1.0" encoding="utf-8"?>'
                 . '<doc>'
                 . '<ubki sessid="' . $this->_session_key . '">'
                 . '<req_envelope>'
                 . '<req_xml>'
-                . base64_encode($req_request)
+                . $req_request
                 . '</req_xml>'
                 . '</req_envelope>'
                 . '</ubki>'
