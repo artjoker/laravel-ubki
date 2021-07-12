@@ -541,7 +541,7 @@
 
             if (isset($params['delete_all_history']) && $params['delete_all_history'] == true) {
                 $this->_delete_all_history = true;
-                $this->_req_type = 'd';
+                $this->_req_type           = 'd';
             }
 
             if (isset($params['request_id'])) {
@@ -807,6 +807,30 @@
             $this->_request_data = $req_request;
 
             return $req_xml = base64_encode($req_request);
+        }
+
+        /**
+         * Get report from UBKI
+         *
+         * @param $attributes
+         * @param $params = [
+         *                'report',      // alias of the type of report
+         *                ]
+         *
+         * @return mixed
+         */
+        public function getSizeRequest($attributes, $params = [])
+        {
+            $this->_attributes = $attributes;
+            $this->_reason_key = LaravelUbki::REASON_CREDIT;
+            $this->_request_id = time();
+            $report_alias      = null;
+            if (isset($params['report'])) {
+                $report_alias = $params['report'];
+            }
+            $this->_request_xml = $this->_getXml($report_alias);
+
+            return strlen($this->_request_xml);
         }
 
     }

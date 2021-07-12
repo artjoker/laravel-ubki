@@ -37,4 +37,19 @@
             return LaravelUbki::sendReport($this->getAttributes(), $params);
         }
 
+        /**
+         * Get size request to UBKI
+         *
+         * @param $params
+         *
+         * @return mixed
+         */
+        public function ubki_size_request($params = [])
+        {
+            if (method_exists($this, 'ubkiAttributes')) {
+                $this->ubkiAttributes($params);
+            }
+            return LaravelUbki::getSizeRequest($this->getAttributes(), $params);
+        }
+
     }
