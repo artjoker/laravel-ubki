@@ -773,8 +773,19 @@
                 dlds="' . Carbon::parse($date_contract)->format('Y-m-d') . '" 
                 dldpf="' . Carbon::parse($expiration_date)->format('Y-m-d') . '" 
                 dldff="' . $close_date . '" 
-                dlflstat="' . $status . '" dlflstatref="" 
-                dlamtlim="0" 
+                dlflstat="' . $status . '" ';
+
+                // sold credit
+                if ($status == 3) {
+                    $req_request .= 'dlsale_date="' . $close_date . '" 
+                dlkontragent="' . $this->_attributes[config('ubki.model_data_upload.dlkontragent')] . '" 
+                dlsale_name="' . $this->_attributes[config('ubki.model_data_upload.dlsale_name')] . '" 
+                dlsale_addr="' . $this->_attributes[config('ubki.model_data_upload.dlsale_addr')] . '" 
+                dlsale_email="' . $this->_attributes[config('ubki.model_data_upload.dlsale_email')] . '"  
+                dlsale_phone="' . $this->_attributes[config('ubki.model_data_upload.dlsale_phone')] . '" ';
+                }
+
+                $req_request .= 'dlamtlim="0" 
                 dlamtpaym="0" 
                 dlamtcur="' . $dlamtcur . '" 
                 dlamtexp="' . $dlamtexp . '" 
