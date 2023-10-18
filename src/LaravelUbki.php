@@ -633,8 +633,7 @@
                         fname="' . $this->_attributes[config('ubki.model_data.fname')] . '" 
                         mname="' . $this->_attributes[config('ubki.model_data.mname')] . '" 
                         bdate="' . $this->_attributes[config('ubki.model_data.bdate')] . '" 
-                        reqlng="' . config('ubki.languages.' . $this->_lang_search) . '" 
-                        reqlngref="">'
+                        reqlng="' . config('ubki.languages.' . $this->_lang_search) . '">'
                 . '<ident inn="' . $this->_attributes[config('ubki.model_data.okpo')] . '" 
                         vdate="' . $vdate . '" 
                         lng="' . config('ubki.languages.' . $this->_lang_search) . '" 
