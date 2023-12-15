@@ -412,10 +412,18 @@
             if ($cod_report != config('ubki.reports.passport') && $cod_report != config('ubki.reports.photo_verify')) {
                 $req_request .= '<spd inn="' . $this->_attributes[config('ubki.model_data.okpo')] . '" />';
 
+                $dterm = '';
+                if ($this->_attributes[config('ubki.model_data_upload.dtype')] == 17) {
+                    if ($this->_attributes[config('ubki.model_data_upload.dterm')] != '') {
+                        $dterm = Carbon::parse($this->_attributes[config('ubki.model_data_upload.dterm')])->format('Y-m-d');
+                    }
+                }
+
                 $req_request .= '<docs><doc 
-                        dtype="' . $this->_attributes[config('ubki.model_data.dtype')] . '"
-                        dser="' . $this->_attributes[config('ubki.model_data.dser')] . '"
-                        dnom="' . $this->_attributes[config('ubki.model_data.dnom')] . '"
+                        dtype="' . $this->_attributes[config('ubki.model_data.dtype')] . '" 
+                        dser="' . $this->_attributes[config('ubki.model_data.dser')] . '" 
+                        dnom="' . $this->_attributes[config('ubki.model_data.dnom')] . '" 
+                        dterm="' . $dterm . '"
                     /></docs>';
 
                 $req_request .= '<contacts><cont
