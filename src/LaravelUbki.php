@@ -413,7 +413,8 @@
                 $req_request .= '<spd inn="' . $this->_attributes[config('ubki.model_data.okpo')] . '" />';
 
                 $dterm = '';
-                if ($this->_attributes[config('ubki.model_data_upload.dtype')] == 17) {
+                $dtype = $this->_attributes[config('ubki.model_data_upload.dtype')];
+                if ($dtype == 17 || $dtype == 3) {
                     if ($this->_attributes[config('ubki.model_data_upload.dterm')] != '') {
                         $dterm = Carbon::parse($this->_attributes[config('ubki.model_data_upload.dterm')])->format('Y-m-d');
                     }
@@ -662,10 +663,15 @@
             $dterm = '';
             $dser  = $this->_attributes[config('ubki.model_data_upload.dser')];
             $dwho  = $this->_attributes[config('ubki.model_data_upload.dwho')];
-            if ($this->_attributes[config('ubki.model_data_upload.dtype')] == 17) {
+            $dtype = $this->_attributes[config('ubki.model_data_upload.dtype')];
+
+            if ($dtype == 17 || $dtype == 3) {
                 if ($this->_attributes[config('ubki.model_data_upload.dterm')] != '') {
                     $dterm = Carbon::parse($this->_attributes[config('ubki.model_data_upload.dterm')])->format('Y-m-d');
                 }
+            }
+
+            if ($dtype == 17) {
                 if ($dwho == '') {
                     $dwho = '0';
                 }

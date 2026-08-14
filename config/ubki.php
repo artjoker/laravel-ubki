@@ -209,7 +209,7 @@
             'dnom'         => 'passport_num_upload',// Номер паспорта или номер ID-карты
             'dwho'         => 'passport_issued',    // Кем выдан документ
             'dwdt'         => 'passport_date',      // Дата выдачи документа
-            'dterm'        => 'passport_terminate', // Дата до которой документ действителен (для ID-карт)
+            'dterm'        => 'passport_terminate', // Дата до которой документ действителен (для ID-карт и загранпаспорта)
             'adindex'      => 'postcode',           // Почтовый индекс
             'adstate'      => 'region',             // Область
             'adcity'       => 'city',               // Населенный пункт
