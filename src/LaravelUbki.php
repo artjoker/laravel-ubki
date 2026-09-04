@@ -88,6 +88,7 @@
          *                'request_id',  // Request ID from our side (if necessary)
          *                'lang'         // Language of search
          *                'test'         // Enables the Test Mode
+         *                'reqreason'    // Причина запроса в бюро (Код из спр.24), overrides config ubki.reqreason
          *                ]
          *
          * @return mixed
@@ -146,7 +147,8 @@
             }
 
             $this->_attributes = $attributes;
-            $this->_reason_key = LaravelUbki::REASON_CREDIT;
+            $this->_reason_key = $params['reqreason']
+                ?? config('ubki.reqreason', LaravelUbki::REASON_CREDIT);
             $this->_request_id = time();
             $report_alias      = null;
             $this->_upload     = false;
@@ -479,6 +481,7 @@
          *                'upload_req_type' // upload_req_type (optional)
          *                'lang'            // Language of upload (optional)
          *                'test'            // Enables the Test Mode
+         *                'reqreason'       // Причина запроса в бюро (Код из спр.24), overrides config ubki.upload_reqreason
          *                ]
          *
          * @return mixed
@@ -537,7 +540,8 @@
             }
 
             $this->_attributes = $attributes;
-            $this->_reason_key = LaravelUbki::REASON_UPLOAD;
+            $this->_reason_key = $params['reqreason']
+                ?? config('ubki.upload_reqreason', LaravelUbki::REASON_UPLOAD);
             $this->_request_id = time();
             $this->_upload     = true;
 
@@ -839,6 +843,7 @@
          * @param $attributes
          * @param $params = [
          *                'report',      // alias of the type of report
+         *                'reqreason',   // Причина запроса в бюро (Код из спр.24), overrides config ubki.reqreason
          *                ]
          *
          * @return mixed
@@ -846,7 +851,8 @@
         public function getSizeRequest($attributes, $params = [])
         {
             $this->_attributes = $attributes;
-            $this->_reason_key = LaravelUbki::REASON_CREDIT;
+            $this->_reason_key = $params['reqreason']
+                ?? config('ubki.reqreason', LaravelUbki::REASON_CREDIT);
             $this->_request_id = time();
             $report_alias      = null;
             if (isset($params['report'])) {
